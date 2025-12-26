@@ -1,3 +1,3 @@
 import pandas as pd
-df = pd.DataFrame({'A': [1, 2, 3], 'B': [4, 5, 6]})
-print(df)
+from sklearn import RandomForestRegressor
+from sklearn.model_selection import train_test_split

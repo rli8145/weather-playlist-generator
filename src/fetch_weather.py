@@ -3,7 +3,7 @@ import requests
 
 #temperature, precipitation, cloud cover
 
-def fetch_by_coords(lat, lon):
+def fetch_weather_by_coords(lat, lon):
     url = "https://api.openweathermap.org/data/2.5/weather"
     params = {
         "lat": lat,
@@ -11,9 +11,7 @@ def fetch_by_coords(lat, lon):
         "appid": os.getenv("OPENWEATHER_API_KEY"),
         "units": "metric"
     }
-    return requests.get(url, params=params).json()
-
-def fetch_weather(data):
+    data = requests.get(url, params=params).json()
     return {
         "temperature": data["main"]["temp"],
         "precipitation": data.get("rain", {}).get("1h", 0),

@@ -9,8 +9,8 @@ load_dotenv()
 def get_user_spotify_client():
     return spotipy.Spotify(
         auth_manager=SpotifyOAuth(
-            client_id=os.getenv("SPOTIFY_CLIENT_ID"),
-            client_secret=os.getenv("SPOTIFY_CLIENT_SECRET"),
+            client_id=os.getenv("RYAN_SPOTIFY_CLIENT_ID"),
+            client_secret=os.getenv("RYAN_SPOTIFY_CLIENT_SECRET"),
             redirect_uri=os.getenv("SPOTIPY_REDIRECT_URI"),
             scope="user-top-read playlist-modify-public playlist-modify-private",
             cache_path=".spotify_cache"
@@ -22,6 +22,7 @@ user_id = sp.current_user()["id"]
 top_tracks = sp.current_user_top_tracks(limit=50, time_range="medium_term")
 track_ids = [item["id"] for item in top_tracks["items"]]
 
+########## Save playlist to profile
 #if option pressed
 username = sp.current_user()["display_name"]
 date_today = date.today().strftime("%Y-%m-%d")

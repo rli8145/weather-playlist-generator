@@ -12,8 +12,4 @@ def fetch_weather_by_coords(lat, lon):
         "units": "metric"
     }
     data = requests.get(url, params=params).json()
-    return {
-        "temperature": data["main"]["temp"],
-        "precipitation": data.get("rain", {}).get("1h", 0),
-        "cloud_cover": data["clouds"]["all"]
-    }
+    return data["weather"]["main"]

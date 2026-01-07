@@ -61,7 +61,20 @@ def add_audio_features(rows):
     return rows
 
 df = pd.read_csv("track_data.csv")
-ids = []
+
+rain_ids = ["37i9dQZF1EIfGrBOUDoRH2", 
+            "47S4MBG0EEXwA0GdJUA4Ur",
+            "37i9dQZF1DXbvABJXBIyiY"]
+clear_ids = ["37i9dQZF1EIhkGftn1D0Mh", 
+             "37i9dQZF1EIh0gn0qhBsTI", 
+             "37i9dQZF1E8MmxIK5TAMPP"]
+cloud_ids = ["37i9dQZF1EIgxHuuVqSn9D",
+             "5L1D0DHxNCvdWkDDrYQIR6",
+             "37i9dQZF1E8IoEX35Mj7fO"]
+snow_ids = ["37i9dQZF1EIg6jLXpdBRnL",
+            "37i9dQZF1DX0Yxoavh5qJV",
+            "37i9dQZF1E8M5ITb7fWzqZ"]
+
 for playlist_id in ids:
     rows = get_playlist_tracks(playlist_id)
     rows = add_audio_features(rows)

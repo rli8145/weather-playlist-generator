@@ -6,7 +6,7 @@ from datetime import date
 
 load_dotenv()
 
-def get_user_spotify_client():
+def get_user_spotify():
     return spotipy.Spotify(
         auth_manager=SpotifyOAuth(
             client_id=os.getenv("RYAN_SPOTIFY_CLIENT_ID"),
@@ -17,7 +17,7 @@ def get_user_spotify_client():
         )
     )
 
-sp = get_user_spotify_client()
+sp = get_user_spotify()
 user_id = sp.current_user()["id"]
 top_tracks = sp.current_user_top_tracks(limit=50, time_range="medium_term")
 track_ids = [item["id"] for item in top_tracks["items"]]
@@ -29,7 +29,7 @@ date_today = date.today().strftime("%Y-%m-%d")
 
 playlist = sp.user_playlist_create(
     user=user_id,
-    name=f"{date_today} : {username}'s Weather-Based Playlist",
+    name=f"{date_today} : {username}'s {weather} Day Playlist",
     public=False
 )
 

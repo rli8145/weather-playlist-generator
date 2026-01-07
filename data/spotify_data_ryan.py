@@ -20,7 +20,7 @@ def get_playlist_tracks(playlist_id):
         resp = sp.playlist_items(
             playlist_id,
             offset=offset,
-            limit=50
+            limit=50,
             additional_types=["track"]
         )
         items = resp.get("items", [])
@@ -60,11 +60,19 @@ def add_audio_features(rows):
                     r[k] = f.get(k)
     return rows
 
+df = pd.read_csv("track_data.csv")
 ids = []
 for playlist_id in ids:
     rows = get_playlist_tracks(playlist_id)
     rows = add_audio_features(rows)
 df = pd.DataFrame(rows)
-out_path = os.path.join(os.getcwd(), "songs.csv")
 
-df.to_csv(out_path, index=False)
+merged = df.merge(
+    df[
+        ["track_id", "energy", "valence", "tempo", "acousticness", "loudness"]
+    ],
+    on="track_id",
+    how="left"
+)
+
+merged.to_csv("track_data.csv", index=False)

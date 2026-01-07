@@ -2,7 +2,7 @@ import os
 import requests
 from dotenv import load_dotenv
 
-# [thunderstorm, drizzle, rain], snow, atmosphere, clear, clouds
+# [thunderstorm, drizzle, rain], snow, clear, [atmosphere, clouds]
 
 load_dotenv()
 

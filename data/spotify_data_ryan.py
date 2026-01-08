@@ -5,6 +5,9 @@ from spotipy.oauth2 import SpotifyOAuth
 from dotenv import load_dotenv
 
 load_dotenv()
+# print(os.getenv("SPOTIPY_CLIENT_ID"))
+# print(os.getenv("SPOTIPY_CLIENT_SECRET"))
+# print(os.getenv("SPOTIPY_REDIRECT_URI"))
 
 features = ["energy", "valence", "tempo", "acousticness", "loudness"]
 
@@ -54,10 +57,11 @@ def get_features(track_ids, weather_label):
 df = pd.DataFrame()
 
 def add_to_df(playlist_ids, weather_label):
+    global df
     for id in playlist_ids:
         track_ids = get_tracks(id)
         df_feats = get_features(track_ids, weather_label)
-    df = pd.concat([df, df_feats], ignore_index=True)
+        df = pd.concat([df, df_feats], ignore_index=True)
 
 add_to_df(rain_ids, "rainy")
 add_to_df(sun_ids, "sunny")

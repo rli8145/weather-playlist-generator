@@ -16,6 +16,7 @@ sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
     open_browser=True
 ))
 
+# next step: save own private playlist and change IDs
 rain_ids = ["37i9dQZF1E8PMD6A7ERiBj", 
             "47S4MBG0EEXwA0GdJUA4Ur",
             "37i9dQZF1DXbvABJXBIyiY"]
@@ -34,7 +35,7 @@ def get_tracks(playlist_id):
     track_ids = []
     for item in res["items"]:
         t = item.get("track")
-        if t and t.get("id"): #track can be unavailable
+        if t and t.get("id"): #track may be unavailable
             track_ids.append(t["id"])
     return track_ids
 

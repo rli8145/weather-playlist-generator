@@ -80,12 +80,4 @@ for playlist_id in ids:
     rows = add_audio_features(rows)
 df = pd.DataFrame(rows)
 
-merged = df.merge(
-    df[
-        ["track_id", "energy", "valence", "tempo", "acousticness", "loudness"]
-    ],
-    on="track_id",
-    how="left"
-)
-
-merged.to_csv("ryan_data.csv", index=False)
+df.to_csv("ryan_data.csv", index=False)

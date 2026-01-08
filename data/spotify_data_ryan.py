@@ -1,71 +1,22 @@
 import os
 import pandas as pd
 import spotipy
-from spotipy.oauth2 import SpotifyClientCredentials
+from spotipy.oauth2 import SpotifyOAuth
+from dotenv import load_dotenv
+
+load_dotenv()
 
 features = ["energy", "valence", "tempo", "acousticness", "loudness"]
 
-sp = spotipy.Spotify(
-    auth_manager=SpotifyClientCredentials(
-        my_id=os.getenv("RYAN_SPOTIFY_CLIENT_ID"),
-        my_secret=os.getenv("RYAN_SPOTIFY_CLIENT_SECRET")
-    )
-)
+sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
+    scope="playlist-read-private playlist-read-collaborative",
+    open_browser=True
+))
 
-def get_playlist_tracks(playlist_id):
-    tracks = []
-    offset = 0
-
-    while True:
-        resp = sp.playlist_items(
-            playlist_id,
-            offset=offset,
-            limit=50,
-            additional_types=["track"]
-        )
-        items = resp.get("items", [])
-        if not items:
-            break
-
-        for it in items:
-            t = it.get("track")
-            if not t or t.get("id") is None:  # skip local/deleted tracks
-                continue
-            tracks.append({
-                "track_id": t["id"],
-                "track_name": t["name"],
-                "artist": ", ".join([a["name"] for a in t["artists"]]),
-                "album": t["album"]["name"],
-                "popularity": t.get("popularity"),
-            })
-
-        offset += len(items)
-        if resp.get("next") is None:
-            break
-
-    return tracks
-
-def add_audio_features(rows):
-    track_ids = [r["track_id"] for r in rows]
-    # Spotify endpoint supports up to 100 ids at a time
-    for i in range(0, len(track_ids), 100):
-        batch_ids = track_ids[i:i+100]
-        feats = sp.audio_features(batch_ids)  # list aligned with batch_ids
-        for r, f in zip(rows[i:i+100], feats):
-            if f is None:
-                for k in features:
-                    r[k] = None
-            else:
-                for k in features:
-                    r[k] = f.get(k)
-    return rows
-
-df = pd.read_csv("track_data.csv")
-
-rain_ids = ["37i9dQZF1EIfGrBOUDoRH2", 
+rain_ids = ["37i9dQZF1E8PMD6A7ERiBj", 
             "47S4MBG0EEXwA0GdJUA4Ur",
             "37i9dQZF1DXbvABJXBIyiY"]
-clear_ids = ["37i9dQZF1EIhkGftn1D0Mh", 
+sun_ids = ["37i9dQZF1EIhkGftn1D0Mh", 
              "37i9dQZF1EIh0gn0qhBsTI", 
              "37i9dQZF1E8MmxIK5TAMPP"]
 cloud_ids = ["37i9dQZF1EIgxHuuVqSn9D",
@@ -75,9 +26,43 @@ snow_ids = ["37i9dQZF1EIg6jLXpdBRnL",
             "37i9dQZF1DX0Yxoavh5qJV",
             "37i9dQZF1E8M5ITb7fWzqZ"]
 
-for playlist_id in ids:
-    rows = get_playlist_tracks(playlist_id)
-    rows = add_audio_features(rows)
-df = pd.DataFrame(rows)
+def get_tracks(playlist_id):
+    res = sp.playlist_items(playlist_id, limit=100, offset=0, additional_types=["track"])
+    track_ids = []
+    for item in res["items"]:
+        t = item.get("track")
+        if t and t.get("id"): #track can be unavailable
+            track_ids.append(t["id"])
+    return track_ids
 
-df.to_csv("ryan_data.csv", index=False)
+def get_features(track_ids, weather_label):
+    features = sp.audio_features(track_ids)
+    rows = []
+    for f in features:
+        if f is None:
+            continue
+        rows.append({
+            "weather": weather_label,
+            "energy": f["energy"],
+            "valence": f["valence"],
+            "tempo": f["tempo"],
+            "acousticness": f["acousticness"],
+            "loudness": f["loudness"],
+        })
+    return pd.DataFrame(rows)
+
+df = pd.DataFrame()
+
+def add_to_df(playlist_ids, weather_label):
+    for id in playlist_ids:
+        track_ids = get_tracks(id)
+        df_feats = get_features(track_ids, weather_label)
+    df = pd.concat([df, df_feats], ignore_index=True)
+
+add_to_df(rain_ids, "rainy")
+add_to_df(sun_ids, "sunny")
+add_to_df(cloud_ids, "cloudy")
+add_to_df(snow_ids, "snowy")
+
+df.to_csv("data/ryan.csv", index=False)
+#csv with columns weather, energy, valence, tempo, acousticness, loudness

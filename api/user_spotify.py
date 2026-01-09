@@ -3,8 +3,12 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from datetime import date
+from api.fetch_weather import fetch_weather_by_coords
 
 load_dotenv()
+
+# Get weather via frontend (IP-based geolocation)
+weather = fetch_weather_by_coords(37.7749, -122.4194)
 
 def get_user_spotify():
     return spotipy.Spotify(
@@ -35,5 +39,5 @@ playlist = sp.user_playlist_create(
 
 sp.playlist_add_items(
     playlist_id=playlist["id"],
-    items=weather_playlist[:5]
+    #items=weather_playlist[:5]
 )

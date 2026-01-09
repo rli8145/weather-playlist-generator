@@ -9,27 +9,21 @@ load_dotenv()
 # print(os.getenv("SPOTIPY_CLIENT_SECRET"))
 # print(os.getenv("SPOTIPY_REDIRECT_URI"))
 
-features = ["energy", "valence", "tempo", "acousticness", "loudness"]
-
 sp = spotipy.Spotify(auth_manager=SpotifyOAuth(
-    scope="playlist-read-private playlist-read-collaborative",
+    scope="playlist-read-private user-read-private",
     open_browser=True
 ))
 
-# next step: save own private playlist and change IDs
-rain_ids = ["37i9dQZF1E8PMD6A7ERiBj", 
-            "47S4MBG0EEXwA0GdJUA4Ur",
-            "37i9dQZF1DXbvABJXBIyiY"]
-sun_ids = ["37i9dQZF1EIhkGftn1D0Mh", 
-             "37i9dQZF1EIh0gn0qhBsTI", 
-             "37i9dQZF1E8MmxIK5TAMPP"]
-cloud_ids = ["37i9dQZF1EIgxHuuVqSn9D",
-             "5L1D0DHxNCvdWkDDrYQIR6",
-             "37i9dQZF1E8IoEX35Mj7fO"]
-snow_ids = ["37i9dQZF1EIg6jLXpdBRnL",
-            "37i9dQZF1DX0Yxoavh5qJV",
-            "37i9dQZF1E8M5ITb7fWzqZ"]
+features = ["energy", "valence", "tempo", "acousticness", "loudness"]
 
+rain_id = "1N29g8ErSCFpDOcjVKIj9s"
+sun_id = "5rF1LIgzA5dyR0VQgqpuSG"
+cloud_id = "3YEYVGm9DWFmwtccWIJUZq"
+snow_id = "4BEXBnXIG3MWvevMlUM2Io"
+
+# next steps: save own private playlist and change IDs, 
+# regenerate track_data.csv,
+# train models
 def get_tracks(playlist_id):
     res = sp.playlist_items(playlist_id, limit=100, offset=0, additional_types=["track"])
     track_ids = []
@@ -57,17 +51,16 @@ def get_features(track_ids, weather_label):
 
 df = pd.DataFrame()
 
-def add_to_df(playlist_ids, weather_label):
+def add_to_df(id, weather_label):
     global df
-    for id in playlist_ids:
-        track_ids = get_tracks(id)
-        df_feats = get_features(track_ids, weather_label)
-        df = pd.concat([df, df_feats], ignore_index=True)
+    track_ids = get_tracks(id)
+    df_feats = get_features(track_ids, weather_label)
+    df = pd.concat([df, df_feats], ignore_index=True)
 
-add_to_df(rain_ids, "rainy")
-add_to_df(sun_ids, "sunny")
-add_to_df(cloud_ids, "cloudy")
-add_to_df(snow_ids, "snowy")
+add_to_df(rain_id, "rainy")
+add_to_df(sun_id, "sunny")
+add_to_df(cloud_id, "cloudy")
+add_to_df(snow_id, "snowy")
 
 df.to_csv("data/ryan.csv", index=False)
 #csv with columns weather, energy, valence, tempo, acousticness, loudness

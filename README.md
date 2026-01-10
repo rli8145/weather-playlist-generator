@@ -1,0 +1,2 @@
+-Spotify web API
+-OpenWeatherMap API

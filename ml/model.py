@@ -4,7 +4,7 @@ from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
 
-def build_model(max_iter: int = 1000):
+def build_model(max_iter = 1000):
     return Pipeline(
         steps=[
             ("scaler", StandardScaler()),

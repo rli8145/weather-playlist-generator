@@ -5,7 +5,7 @@ from sklearn.ensemble import RandomForestClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
-def naive_bayes():
+def naive_bayes() -> Pipeline:
     return Pipeline(
         steps=[
             ("scaler", StandardScaler()),
@@ -13,7 +13,7 @@ def naive_bayes():
         ]
     )
 
-def logistic_regression(max_iter = 1000):
+def logistic_regression(max_iter: int = 1000) -> Pipeline:
     return Pipeline(
         steps=[
             ("scaler", StandardScaler()),
@@ -21,7 +21,7 @@ def logistic_regression(max_iter = 1000):
         ]
     )
 
-def random_forest():
+def random_forest() -> Pipeline:
     return Pipeline(
         steps=[
             ("scaler", StandardScaler()),

@@ -4,3 +4,4 @@ numpy==2.2.6
 pandas==2.3.30
 scikit-learn==1.7.2
 spotipy==2.25.2
+matplotlib>=3.8

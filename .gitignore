@@ -3,4 +3,3 @@ __pycache__/
 .env
 .cache
 personal.csv
-track_data.csv

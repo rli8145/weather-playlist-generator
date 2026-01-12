@@ -3,7 +3,7 @@ from sklearn.metrics import f1_score
 from sklearn.model_selection import train_test_split
 
 from data import load_data
-from models import naive_bayes, logistic_regression, random_forest
+from models import naive_bayes, logistic_regression, random_forest, gradient_boosting
 
 def _stratify_target(y: pd.Series) -> pd.Series | None:
     class_counts = y.value_counts()
@@ -31,6 +31,7 @@ def main() -> None:
         "Naive Bayes": naive_bayes(),
         "Logistic Regression": logistic_regression(),
         "Random Forest": random_forest(),
+        "Gradient Boosting": gradient_boosting()
     }
     for name, model in models.items():
         _evaluate_model(name, model, X_train, X_test, y_train, y_test)
@@ -38,6 +39,7 @@ def main() -> None:
 if __name__ == "__main__":
     main()
 
-# Naive Bayes F1 Score: 0.7342055198289412
-# Logistic Regression F1 Score: 0.7173927345064577
-# Random Forest F1 Score: 0.7525009070941633
+# Naive Bayes F1 Score: 0.7223416790199648
+# Logistic Regression F1 Score: 0.72215997949385
+# Random Forest F1 Score: 0.757040842060313
+# Gradient Boosting F1 Score: 0.7545467401279987

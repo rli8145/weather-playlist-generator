@@ -1,7 +1,7 @@
 import pandas as pd
 from sklearn.linear_model import LogisticRegression
 from sklearn.naive_bayes import GaussianNB
-from sklearn.ensemble import RandomForestClassifier
+from sklearn.ensemble import RandomForestClassifier, GradientBoostingClassifier
 from sklearn.pipeline import Pipeline
 from sklearn.preprocessing import StandardScaler
 
@@ -26,5 +26,13 @@ def random_forest() -> Pipeline:
         steps=[
             ("scaler", StandardScaler()),
             ("classifier", RandomForestClassifier()),
+        ]
+    )
+
+def gradient_boosting() -> Pipeline:
+    return Pipeline(
+        steps=[
+            ("scaler", StandardScaler()),
+            ("classifier", GradientBoostingClassifier()),
         ]
     )

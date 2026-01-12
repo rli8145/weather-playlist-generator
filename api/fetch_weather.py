@@ -18,11 +18,13 @@ def fetch_weather_by_coords(lat, lon):
 
     conditions = data["weather"][0]["main"]
     if conditions in ["Thunderstorm", "Drizzle", "Rain"]:
-        return "rain"
+        return "Rainy"
     if conditions in ["Atmosphere", "Clouds"]:
-        return "clouds"
+        return "Cloudy"
+    if conditions == "Snow":
+        return "Snowy"
     else:
-        return conditions.lower()
-    
+        return "Sunny"
+
 # display conditions, temp, cloud cover, precipitation, icon also
 

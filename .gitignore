@@ -3,3 +3,4 @@ __pycache__/
 .env
 .cache
 personal.csv
+.spotify_cache

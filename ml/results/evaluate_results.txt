@@ -1,0 +1,28 @@
+Naive Bayes CV F1 Score: 0.7445 (+/- 0.0162)
+Naive Bayes F1 Score: 0.7223
+Naive Bayes confusion matrix:
+[[218  23   6  13]
+ [ 49 119  91   1]
+ [ 28  55 177   0]
+ [ 16   0   0 244]]
+Logistic Regression CV F1 Score: 0.7380 (+/- 0.0166)
+Logistic Regression F1 Score: 0.7222
+Logistic Regression confusion matrix:
+[[212  23  10  15]
+ [ 46 125  89   0]
+ [ 23  59 177   1]
+ [ 18   0   0 242]]
+Random Forest CV F1 Score: 0.7603 (+/- 0.0098)
+Random Forest F1 Score: 0.7575
+Random Forest confusion matrix:
+[[204  27  15  14]
+ [ 34 168  58   0]
+ [ 18  71 171   0]
+ [ 15   0   0 245]]
+Gradient Boosting CV F1 Score: 0.7573 (+/- 0.0138)
+Gradient Boosting F1 Score: 0.7535
+Gradient Boosting confusion matrix:
+[[208  25  15  12]
+ [ 44 156  60   0]
+ [ 23  62 175   0]
+ [ 14   0   0 246]]

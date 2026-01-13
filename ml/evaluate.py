@@ -1,11 +1,22 @@
 import matplotlib.pyplot as plt
 import pandas as pd
 from sklearn.metrics import ConfusionMatrixDisplay, confusion_matrix, f1_score
+from sklearn.inspection import permutation_importance
 from sklearn.model_selection import KFold, StratifiedKFold, cross_val_score, train_test_split
 
-from data import load_data
+from data import load_data, features
 from models import naive_bayes, logistic_regression, random_forest, gradient_boosting
 
+
+# F1 SCORE
+def evaluate_f1(name: str, model, X_train, X_test, y_train, y_test) -> float:
+    model.fit(X_train, y_train)
+    predictions = model.predict(X_test)
+    score = f1_score(y_test, predictions, average="weighted")
+    print(f"{name} F1 Score: {score:.4f}")
+    return score
+
+# CROSS VALIDATION F1
 def build_cv(y: pd.Series, n_splits: int = 5, random_state: int = 42):
     min_class_count = y.value_counts().min()
     if min_class_count >= 2:
@@ -23,13 +34,30 @@ def cross_validate(name: str, model, X, y, cv) -> list[float]:
     print(f"{name} CV F1 Score: {mean_score:.4f} (+/- {std_score:.4f})")
     return scores.tolist()
 
-def evaluate_holdout(name: str, model, X_train, X_test, y_train, y_test) -> float:
-    model.fit(X_train, y_train)
-    predictions = model.predict(X_test)
-    score = f1_score(y_test, predictions, average="weighted")
-    print(f"{name} F1 Score: {score:.4f}")
-    return score
+# PERMUTATION IMPORTANCE
+def evaluate_permutation_importance(
+    name: str,
+    model,
+    X,
+    y,
+    n_repeats: int = 10,
+    random_state: int = 42,
+) -> pd.Series:
+    model.fit(X, y)
+    result = permutation_importance(
+        model,
+        X,
+        y,
+        n_repeats=n_repeats,
+        random_state=random_state,
+        scoring="f1_weighted",
+    )
+    importance = pd.Series(result.importances_mean, index=features).sort_values(ascending=False)
+    print(f"{name} permutation importance:")
+    print(importance.to_string())
+    return importance
 
+# MAIN EVALUATION FUNCTION, PLOT CONFUSION MATRICES
 def main() -> None:
     X, y = load_data()
     cv = build_cv(y)
@@ -55,7 +83,8 @@ def main() -> None:
 
     for ax, (name, model) in zip(axes, models.items()):
         cross_validate(name, model, X, y, cv)
-        evaluate_holdout(name, model, X_train, X_test, y_train, y_test)
+        evaluate_f1(name, model, X_train, X_test, y_train, y_test)
+        evaluate_permutation_importance(name, model, X_train, y_train)
         predictions = model.predict(X_test)
         matrix = confusion_matrix(y_test, predictions, labels=labels)
         print(f"{name} confusion matrix:")

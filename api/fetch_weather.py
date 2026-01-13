@@ -26,5 +26,5 @@ def fetch_weather_by_coords(lat, lon):
     else:
         return "Sunny"
 
-# display conditions, temp, cloud cover, precipitation, icon also
+# TODO display conditions, temp, cloud cover, precipitation, icon also
 

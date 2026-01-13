@@ -3,7 +3,7 @@ from dotenv import load_dotenv
 import spotipy
 from spotipy.oauth2 import SpotifyOAuth
 from datetime import date
-from api.fetch_weather import fetch_weather_by_coords
+from fetch_weather import fetch_weather_by_coords
 
 import pandas as pd
 import requests
@@ -28,10 +28,18 @@ def get_user_spotify():
 
 sp = get_user_spotify()
 user_id = sp.current_user()["id"]
-top_tracks = sp.current_user_recently_played(limit=100)
+first_page = sp.current_user_recently_played(limit=50)
+items = list(first_page.get("items", []))
+if items:
+    last_played_at = items[-1].get("played_at")
+    if last_played_at:
+        before_ms = int(pd.Timestamp(last_played_at).timestamp() * 1000)
+        second_page = sp.current_user_recently_played(limit=50, before=before_ms)
+        items.extend(second_page.get("items", []))
+
 track_ids = [
     item["track"]["id"]
-    for item in top_tracks["items"]
+    for item in items
     if item.get("track") and item["track"].get("id")
 ]
 

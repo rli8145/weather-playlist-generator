@@ -1,0 +1,6 @@
+# Ignore model files (they're typically large)
+*.pkl
+*.joblib
+
+# But keep the directory structure
+!.gitkeep

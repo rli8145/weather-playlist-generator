@@ -16,14 +16,14 @@ The ML pipeline predicts a weather-related label from song audio features and po
 
 Implemented in `ml/models.py`:
 
-- Naive Bayes
-- Logistic Regression
-- Random Forest
-- Gradient Boosting (default example model)
+- Naive Bayes 
+- Logistic Regression (baseline)
+- Random Forest 
+- Gradient Boosting (production)
 
 ### Training
 
-Train all models and return a dictionary of trained estimators:
+Train all models and return a dictionary of models after training:
 
 ```bash
 python ml/train.py
@@ -36,7 +36,7 @@ python ml/train.py
 - Weighted F1 on a holdout split
 - Stratified cross-validated F1
 - Permutation feature importance
-- Confusion matrices (visualized)
+- Confusion matrices (visualized using matplotlib)
 
 ```bash
 python ml/evaluate.py
@@ -44,7 +44,7 @@ python ml/evaluate.py
 
 ### Prediction Flow
 
-`ml/model_sample.py` prompts for audio features, builds a single-row dataframe, and predicts the weather label to decide how long to save a song.
+`ml/model_sample.py` prompts for audio features and predicts the matching weather label.
 
 ```bash
 python ml/model_sample.py
@@ -53,7 +53,7 @@ python ml/model_sample.py
 ## APIs
 
 - Spotify Web API (song lookup)
-- OpenWeatherMap API (weather context)
+- OpenWeatherMap API (real-time weather context)
 - ReccoBeats API (audio features)
 
 ## Local Setup
@@ -66,7 +66,7 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Run the ML scripts above.
+2. Run the Prediction Flow scripts above.
 
 ## Issues
 

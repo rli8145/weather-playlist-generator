@@ -1,6 +1,6 @@
 # Weather Playlist Generator
 
-Generate playlists that match the weather by predicting how long a song should be saved based on its audio features.
+Predicting a suitable weather category given a song's audio features.
 
 ## ML Component (Core)
 

@@ -1,0 +1,52 @@
+Naive Bayes CV F1 Score: 0.7445 (+/- 0.0162)
+Naive Bayes F1 Score: 0.7223
+Naive Bayes permutation importance:
+energy          0.145871
+valence         0.125655
+acousticness    0.100187
+loudness        0.084708
+tempo           0.066173
+Naive Bayes confusion matrix:
+[[218  23   6  13]
+ [ 49 119  91   1]
+ [ 28  55 177   0]
+ [ 16   0   0 244]]
+Logistic Regression CV F1 Score: 0.7380 (+/- 0.0166)
+Logistic Regression F1 Score: 0.7222
+Logistic Regression permutation importance:
+energy          0.157052
+valence         0.143237
+acousticness    0.086010
+loudness        0.084385
+tempo           0.073690
+Logistic Regression confusion matrix:
+[[212  23  10  15]
+ [ 46 125  89   0]
+ [ 23  59 177   1]
+ [ 18   0   0 242]]
+Random Forest CV F1 Score: 0.7597 (+/- 0.0125)
+Random Forest F1 Score: 0.7604
+Random Forest permutation importance:
+energy          0.358156
+valence         0.285441
+acousticness    0.258516
+loudness        0.247231
+tempo           0.196821
+Random Forest confusion matrix:
+[[207  27  13  13]
+ [ 31 168  61   0]
+ [ 19  73 168   0]
+ [ 16   0   0 244]]
+Gradient Boosting CV F1 Score: 0.7577 (+/- 0.0138)
+Gradient Boosting F1 Score: 0.7545
+Gradient Boosting permutation importance:
+energy          0.234394
+valence         0.177032
+acousticness    0.136078
+loudness        0.120831
+tempo           0.114509
+Gradient Boosting confusion matrix:
+[[208  25  15  12]
+ [ 44 157  59   0]
+ [ 23  62 175   0]
+ [ 14   0   0 246]]

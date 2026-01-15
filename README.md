@@ -85,6 +85,6 @@ see ml/results/evaluate_results.txt for other final diagnostics
 - ReccoBeats API (audio features)
 - OpenWeatherMap API (real-time weather context)
 
-## Notes
+## Issues
 
-- Spotify API access can be limited; ReccoBeats was added for audio features but can be slow. Caching may be needed for production use.
+- As of Nov. 2024, Spotify API does not provide access to audio features. ReccoBeats was thus added for audio features but API response times are often slow and inconsistent. In the future we can experiment with caching song information.

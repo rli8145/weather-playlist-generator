@@ -1,6 +1,6 @@
-# Weather Playlist Generator
+# Weather-Conditioned Music Classification Engine
 
-Predict a suitable weather category given a song's audio features, then use it to drive playlist mood.
+Predict a suitable weather category given a song's audio features.
 
 Demo video: https://drive.google.com/file/d/1nc7trHjiscxEsSmc9bRy0GR-1T8RSImB/view?usp=sharing
 

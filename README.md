@@ -52,14 +52,23 @@ This runs a simple prompt-driven predictor and does not use the web app.
 python 'ml/features->weather.py'
 ```
 
-It will ask for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo (BPM)`, `acousticness [0.0, 1.0]`, and `loudness (dB)` in order, then prints the predicted weather category.
+The user will be prompted for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo (BPM)`, `acousticness [0.0, 1.0]`, and `loudness (dB)` in order, and the predicted weather category is printed.
+
+## Tech Stack
+- Python - `scikit-learn`, `pandas`, `matplotlib`, `FastAPI` (served via `Uvicorn`)
+- React, Typescript, Tailwind CSS
+
+## APIs Used
+- Spotify Web API (song lookup)
+- ReccoBeats API (audio features)
+- OpenWeatherMap API (real-time weather context) (NOT USED IN CURRENT VERSION)
 
 ## ML Component
 
-- Data source: `data/track_data.csv`
-- Features: `energy`, `valence`, `tempo`, `acousticness`, `loudness`
+- Data source: `data/track_data.csv`. 
+- Features: `energy`, `valence`, `tempo`, `acousticness`, `loudness`. `StandardScalar` was used to standardize each feature.
 - Target label: `weather`: one of `sunny`, `cloudy`, `rainy`, `snowy` 
-- Models in `ml/models.py`, implemented using scikit-learn: Naive Bayes, Logistic Regression (baseline), Random Forest, Gradient Boosting (production)
+- Models in `ml/models.py`, trained using `Pipeline` to avoid data leakage: Naive Bayes, Logistic Regression (baseline), Random Forest, Gradient Boosting (production)
 
 Training and evaluation scripts:
 
@@ -70,18 +79,12 @@ python ml/evaluate.py
 
 Evaluation metrics and diagnostics used in `ml/evaluate.py`:
 
-- Weighted F1 on a holdout split, cross-validated F1
-- Permutation feature importance
+- Weighted F1 on a simple holdout split was initially used, and we improved to Stratified K-Fold cross-validation with weighted F1
+- Permutation feature importance (PFI)
 - Confusion matrices (visualized using matplotlib)
 
 ![Confusion matrices](ml/results/confusion_matrices.png)
-see ml/results/evaluate_results.txt for other final diagnostics
-
-## APIs Used
-
-- Spotify Web API (song lookup)
-- ReccoBeats API (audio features)
-- OpenWeatherMap API (real-time weather context) (NOT USED IN CURRENT VERSION)
+see `ml/results/evaluate_results.txt` for other final diagnostics
 
 ## Issues
 

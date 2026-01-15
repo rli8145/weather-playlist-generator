@@ -8,8 +8,15 @@ from contextlib import asynccontextmanager
 import numpy as np
 import logging
 
-from .schemas import PredictionRequest, PredictionResponse, HealthResponse
+from .schemas import (
+    PredictionRequest,
+    PredictionResponse,
+    SongSearchRequest,
+    SongWeatherResponse,
+    HealthResponse
+)
 from .model_loader import ModelLoader
+from .spotify_service import spotify_service
 
 # Configure logging
 logging.basicConfig(level=logging.INFO)
@@ -162,6 +169,89 @@ async def predict(request: PredictionRequest):
         raise HTTPException(
             status_code=500,
             detail="Prediction failed. Check server logs for details."
+        )
+
+
+@app.post("/predict-song", response_model=SongWeatherResponse)
+async def predict_song_weather(request: SongSearchRequest):
+    """
+    Search for a song on Spotify and predict its weather
+
+    This endpoint combines Spotify search + audio feature extraction + ML prediction
+
+    **Flow:**
+    1. Search Spotify for the song
+    2. Fetch audio features (energy, valence, tempo, acousticness, loudness)
+    3. Run ML prediction to classify weather
+    4. Return track info + weather prediction
+
+    **Example request:**
+    ```json
+    {
+        "query": "Happy - Pharrell Williams"
+    }
+    ```
+    """
+    if not model_loader or not model_loader.model:
+        raise HTTPException(
+            status_code=503,
+            detail="ML model not loaded. Please check server configuration."
+        )
+
+    try:
+        # Search Spotify and get audio features
+        logger.info(f"Searching Spotify for: {request.query}")
+        song_data = spotify_service.get_track_info_and_features(request.query)
+
+        if not song_data:
+            raise HTTPException(
+                status_code=404,
+                detail=f"No songs found for query: {request.query}"
+            )
+
+        # Extract audio features for ML prediction
+        audio_features = song_data["audio_features"]
+        features = np.array([[
+            audio_features["energy"],
+            audio_features["valence"],
+            audio_features["tempo"],
+            audio_features["acousticness"],
+            audio_features["loudness"]
+        ]])
+
+        # Get ML prediction
+        prediction, confidence = model_loader.predict(features)
+
+        logger.info(
+            f"Song: {song_data['name']} by {song_data['artist']} → "
+            f"Weather: {prediction} (confidence: {confidence:.2%})"
+        )
+
+        return SongWeatherResponse(
+            track_id=song_data["track_id"],
+            name=song_data["name"],
+            artist=song_data["artist"],
+            album=song_data["album"],
+            image_url=song_data["image_url"],
+            preview_url=song_data["preview_url"],
+            weather=prediction,
+            confidence=round(confidence, 4),
+            audio_features=audio_features
+        )
+
+    except HTTPException:
+        raise
+    except ValueError as e:
+        logger.error(f"Spotify API error: {e}")
+        raise HTTPException(
+            status_code=503,
+            detail="Spotify service not configured. Please set SPOTIPY_CLIENT_ID and SPOTIPY_CLIENT_SECRET environment variables."
+        )
+    except Exception as e:
+        logger.error(f"Song prediction error: {e}", exc_info=True)
+        raise HTTPException(
+            status_code=500,
+            detail=f"Failed to process song: {str(e)}"
         )
 
 

@@ -39,9 +39,7 @@ npm install
 npm run dev
 ```
 
-5. Open the app at `http://localhost:5173`.
-
-If your backend runs on a different host/port, set `VITE_API_URL` before `npm run dev`.
+5. Open the app using the given `localhost` server.
 
 ### Demo 2: Manual Features via the ML Script
 

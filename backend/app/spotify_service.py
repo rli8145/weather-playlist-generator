@@ -1,14 +1,18 @@
 """
-Spotify API Service using spotipy
-Handles song search and audio feature extraction
+Spotify + Reccobeats API Service
+Handles song search via Spotify and audio feature extraction via Reccobeats
 """
 import os
 from typing import Optional, Dict
 import logging
+import requests
 import spotipy
 from spotipy.oauth2 import SpotifyClientCredentials
 
 logger = logging.getLogger(__name__)
+
+# Reccobeats API base URL
+RECCOBEATS_BASE_URL = "https://api.reccobeats.com"
 
 
 class SpotifyService:
@@ -70,9 +74,41 @@ class SpotifyService:
             logger.error(f"Spotify search failed: {e}")
             raise Exception(f"Failed to search Spotify: {str(e)}")
 
+    def spotify_to_recco(self, spotify_track_id: str) -> Optional[str]:
+        """
+        Convert Spotify track ID to Reccobeats track ID
+
+        Args:
+            spotify_track_id: Spotify track ID
+
+        Returns:
+            Reccobeats track ID or None if not found
+        """
+        try:
+            response = requests.get(
+                f"{RECCOBEATS_BASE_URL}/v1/track",
+                params={"ids": spotify_track_id},
+                timeout=30
+            )
+            response.raise_for_status()
+            data = response.json()
+
+            tracks = data.get("data", [])
+            if not tracks:
+                logger.warning(f"No Reccobeats track found for Spotify ID: {spotify_track_id}")
+                return None
+
+            recco_id = tracks[0].get("id")
+            logger.info(f"Converted Spotify ID {spotify_track_id} → Reccobeats ID {recco_id}")
+            return recco_id
+
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to convert Spotify ID to Reccobeats: {e}")
+            return None
+
     def get_audio_features(self, track_id: str) -> Dict[str, float]:
         """
-        Get audio features for a specific track
+        Get audio features for a specific track using Reccobeats API
 
         Args:
             track_id: Spotify track ID
@@ -80,30 +116,45 @@ class SpotifyService:
         Returns:
             Dictionary containing audio features needed for ML prediction
         """
-        if not self.sp:
-            raise ValueError("Spotify service not initialized. Check credentials.")
+        # Convert Spotify ID to Reccobeats ID
+        recco_id = self.spotify_to_recco(track_id)
+
+        if not recco_id:
+            raise Exception(f"Could not find Reccobeats ID for Spotify track {track_id}")
 
         try:
-            features = self.sp.audio_features([track_id])[0]
+            # Get audio features from Reccobeats
+            response = requests.get(
+                f"{RECCOBEATS_BASE_URL}/v1/track/{recco_id}/audio-features",
+                timeout=30
+            )
 
-            if not features:
-                raise Exception(f"No audio features found for track {track_id}")
+            if response.status_code == 404:
+                raise Exception(f"No audio features found for track {recco_id}")
+
+            response.raise_for_status()
+            features = response.json()
 
             # Extract only the features needed for ML prediction
+            # Using the same feature names as your ML model expects
             audio_features = {
-                "energy": features["energy"],
-                "valence": features["valence"],
-                "tempo": features["tempo"],
-                "acousticness": features["acousticness"],
-                "loudness": features["loudness"],
+                "energy": features.get("energy"),
+                "valence": features.get("valence"),
+                "tempo": features.get("tempo"),
+                "acousticness": features.get("acousticness"),
+                "loudness": features.get("loudness"),
             }
 
-            logger.info(f"Retrieved audio features for track {track_id}")
+            # Validate all features are present
+            if any(value is None for value in audio_features.values()):
+                raise Exception(f"Missing audio features for track {recco_id}")
+
+            logger.info(f"Retrieved audio features from Reccobeats for track {track_id}")
 
             return audio_features
 
-        except Exception as e:
-            logger.error(f"Failed to get audio features: {e}")
+        except requests.exceptions.RequestException as e:
+            logger.error(f"Failed to get audio features from Reccobeats: {e}")
             raise Exception(f"Failed to get audio features: {str(e)}")
 
     def get_track_info_and_features(self, query: str) -> Optional[Dict]:

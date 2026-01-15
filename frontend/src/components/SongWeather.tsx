@@ -65,13 +65,13 @@ export const SongWeather = ({ onWeatherChange }: SongWeatherProps) => {
   const getWeatherDescription = (weather: SongWeatherType): string => {
     switch (weather) {
       case "sunny":
-        return "This song radiates warmth and positive energy";
+        return "Save this song for sunny days!";
       case "cloudy":
-        return "A contemplative mood with subtle emotional depth";
+        return "Save this song for cloudy days!";
       case "rainy":
-        return "Deep emotional resonance with melancholic undertones";
+        return "Save this song for rainy days!";
       case "snowy":
-        return "Calm, serene vibes with a peaceful atmosphere";
+        return "Save this song for snowy days!";
     }
   };
 
@@ -87,8 +87,8 @@ export const SongWeather = ({ onWeatherChange }: SongWeatherProps) => {
           <Music2 className="w-6 h-6 text-primary" />
         </div>
         <div>
-          <h2 className="text-xl font-display font-semibold text-foreground">Song Weather</h2>
-          <p className="text-sm text-muted-foreground">Discover the mood of any song</p>
+          <h2 className="text-xl font-display font-semibold text-foreground">Start here</h2>
+          <p className="text-sm text-muted-foreground">When should you listen to this song?</p>
         </div>
       </div>
 
@@ -96,7 +96,7 @@ export const SongWeather = ({ onWeatherChange }: SongWeatherProps) => {
         <div className="relative flex-1">
           <Search className="absolute left-3 top-1/2 -translate-y-1/2 w-4 h-4 text-muted-foreground" />
           <Input
-            placeholder="Search song title or artist..."
+            placeholder="Search song title..."
             value={query}
             onChange={(e) => setQuery(e.target.value)}
             onKeyDown={handleKeyDown}
@@ -129,7 +129,7 @@ export const SongWeather = ({ onWeatherChange }: SongWeatherProps) => {
               <div className="w-16 h-16 rounded-full border-2 border-primary/20 border-t-primary animate-spin" />
               <Music2 className="absolute top-1/2 left-1/2 -translate-x-1/2 -translate-y-1/2 w-6 h-6 text-primary" />
             </div>
-            <p className="mt-4 text-sm text-muted-foreground">Analyzing audio characteristics...</p>
+            <p className="mt-4 text-sm text-muted-foreground">Analyzing audio features...</p>
           </motion.div>
         )}
 

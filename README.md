@@ -58,7 +58,7 @@ It will ask for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo (BPM)`, `acous
 
 - Data source: `data/track_data.csv`
 - Features: `energy`, `valence`, `tempo`, `acousticness`, `loudness`
-- Target label: `weather`
+- Target label: `weather`: one of `sunny`, `cloudy`, `rainy`, `snowy` 
 - Models in `ml/models.py`, implemented using scikit-learn: Naive Bayes, Logistic Regression (baseline), Random Forest, Gradient Boosting (production)
 
 Training and evaluation scripts:

@@ -37,7 +37,7 @@ const Index = () => {
                   Forecast.fm
                 </h1>
                 <p className="text-xs text-muted-foreground">
-                  Extracting weather from sound
+                  Matching songs to weather conditions
                 </p>
               </div>
             </div>
@@ -54,10 +54,10 @@ const Index = () => {
             transition={{ delay: 0.1 }}
           >
             <h2 className="text-4xl md:text-5xl font-display font-bold text-foreground mb-4">
-              Feel the <span className="text-primary">Atmosphere</span>
+              Feel the <span className="text-primary">MUSIC</span>
             </h2>
             <p className="text-lg text-muted-foreground max-w-md mx-auto">
-              Discover how music shapes your emotional landscape
+              A Weather-Conditioned Music Classification Engine
             </p>
           </motion.div>
 
@@ -74,7 +74,7 @@ const Index = () => {
           animate={{ opacity: 1 }}
           transition={{ delay: 0.5 }}
         >
-          <p>Built with atmospheric precision</p>
+          <p>Built by Daniel Kwan and Ryan Li</p>
         </motion.footer>
       </div>
     </div>

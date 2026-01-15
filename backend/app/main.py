@@ -7,6 +7,7 @@ from fastapi.middleware.cors import CORSMiddleware
 from contextlib import asynccontextmanager
 import numpy as np
 import logging
+from pathlib import Path
 
 from .schemas import (
     PredictionRequest,
@@ -33,7 +34,8 @@ async def lifespan(app: FastAPI):
     logger.info("Starting Forecast.fm API...")
     logger.info("Loading ML model...")
 
-    model_loader = ModelLoader(models_dir="../models")
+    models_dir = (Path(__file__).resolve().parent.parent / "models")
+    model_loader = ModelLoader(models_dir=str(models_dir))
 
     try:
         model_loader.load()
@@ -67,9 +69,11 @@ app.add_middleware(
         "http://localhost:3000",      # React default
         "http://localhost:5173",      # Vite default
         "http://localhost:5174",
+        "http://localhost:8080",
         "http://127.0.0.1:3000",
         "http://127.0.0.1:5173",
         "http://127.0.0.1:5174",
+        "http://127.0.0.1:8080",
         # Add your production frontend URL here
     ],
     allow_credentials=True,

@@ -1,64 +1,14 @@
 # Weather Playlist Generator
 
-Predicting a suitable weather category given a song's audio features.
+Predict a suitable weather category given a song's audio features, then use it to drive playlist mood.
 
-## ML Component (Core)
+## Two Demo Paths
 
-The ML pipeline predicts a weather-related label from song audio features and powers the playlist logic.
+### Demo 1: Run the Website Locally
 
-### Data
+This starts the FastAPI backend + the Vite frontend.
 
-- Source: `data/track_data.csv`
-- Features used: `energy`, `valence`, `tempo`, `acousticness`, `loudness`
-- Target: `weather`
-
-### Models
-
-Implemented in `ml/models.py`:
-
-- Naive Bayes 
-- Logistic Regression (baseline)
-- Random Forest 
-- Gradient Boosting (production)
-
-### Training
-
-Train all models and return a dictionary of models after training:
-
-```bash
-python ml/train.py
-```
-
-### Evaluation
-
-`ml/evaluate.py` runs:
-
-- Weighted F1 on a holdout split
-- Stratified cross-validated F1
-- Permutation feature importance
-- Confusion matrices (visualized using matplotlib)
-
-```bash
-python ml/evaluate.py
-```
-
-### Prediction Flow
-
-`ml/model_sample.py` prompts for audio features and predicts the matching weather label.
-
-```bash
-python ml/model_sample.py
-```
-
-## APIs
-
-- Spotify Web API (song lookup)
-- OpenWeatherMap API (real-time weather context)
-- ReccoBeats API (audio features)
-
-## Local Setup
-
-1. Create a virtual environment and install dependencies:
+1. Backend setup:
 
 ```bash
 python -m venv venv
@@ -66,9 +16,73 @@ source venv/bin/activate
 pip install -r requirements.txt
 ```
 
-2. Run the Prediction Flow scripts above.
+2. Set Spotify credentials (go to Spotify Web API):
 
-## Issues
+```bash
+export SPOTIPY_CLIENT_ID="your_spotify_client_id"
+export SPOTIPY_CLIENT_SECRET="your_spotify_client_secret"
+```
 
-- As of Nov. 2024, Spotify API denies access to song features
-- ReccoBeats API, which provided alternative access to song features, had very slow response times. Future improvement may involve caching audio features when possible.
+3. Start the API (uses `backend/models/model.pkl` if present):
+
+```bash
+uvicorn backend.app.main:app --reload --port 8000
+```
+
+4. Start the frontend in a second terminal:
+
+```bash
+cd frontend
+npm install
+npm run dev
+```
+
+5. Open the app at `http://localhost:5173`.
+
+If your backend runs on a different host/port, set `VITE_API_URL` before `npm run dev`.
+
+### Demo 2: Manual Features via the ML Script
+
+This runs a simple prompt-driven predictor and does not use the web app.
+
+1. Ensure the Python environment is ready (same as Demo 1).
+2. Run the script and enter features when prompted:
+
+```bash
+python 'ml/features->weather.py'
+```
+
+It will ask for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo (BPM)`, `acousticness [0.0, 1.0]`, and `loudness (dB)` in order, then prints the predicted weather category.
+
+## ML Component (Core)
+
+- Data source: `data/track_data.csv`
+- Features: `energy`, `valence`, `tempo`, `acousticness`, `loudness`
+- Target label: `weather`
+- Models in `ml/models.py`, implemented using scikit-learn: Naive Bayes, Logistic Regression (baseline), Random Forest, Gradient Boosting (production)
+
+Training and evaluation scripts:
+
+```bash
+python ml/train.py
+python ml/evaluate.py
+```
+
+Evaluation metrics and diagnostics used in `ml/evaluate.py`:
+
+- Weighted F1 on a holdout split, cross-validated F1
+- Permutation feature importance
+- Confusion matrices (visualized using matplotlib)
+
+![Confusion matrices](ml/results/confusion_matrices.png)
+see ml/results/evaluate_results.txt for other final diagnostics
+
+## APIs Used
+
+- Spotify Web API (song lookup)
+- ReccoBeats API (audio features)
+- OpenWeatherMap API (real-time weather context)
+
+## Notes
+
+- Spotify API access can be limited; ReccoBeats was added for audio features but can be slow. Caching may be needed for production use.

@@ -83,7 +83,7 @@ see ml/results/evaluate_results.txt for other final diagnostics
 
 - Spotify Web API (song lookup)
 - ReccoBeats API (audio features)
-- OpenWeatherMap API (real-time weather context)
+- OpenWeatherMap API (real-time weather context) (NOT USED IN CURRENT VERSION)
 
 ## Issues
 

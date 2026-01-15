@@ -2,6 +2,8 @@
 
 Predict a suitable weather category given a song's audio features, then use it to drive playlist mood.
 
+Demo video: https://drive.google.com/file/d/1nc7trHjiscxEsSmc9bRy0GR-1T8RSImB/view?usp=sharing
+
 ## Two Demo Paths
 
 ### Demo 1: Run the Website Locally
@@ -54,7 +56,7 @@ python 'ml/features->weather.py'
 
 It will ask for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo (BPM)`, `acousticness [0.0, 1.0]`, and `loudness (dB)` in order, then prints the predicted weather category.
 
-## ML Component (Core)
+## ML Component
 
 - Data source: `data/track_data.csv`
 - Features: `energy`, `valence`, `tempo`, `acousticness`, `loudness`

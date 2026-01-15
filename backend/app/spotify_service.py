@@ -93,7 +93,8 @@ class SpotifyService:
             response.raise_for_status()
             data = response.json()
 
-            tracks = data.get("data", [])
+            # Reccobeats returns "content" not "data"
+            tracks = data.get("content", [])
             if not tracks:
                 logger.warning(f"No Reccobeats track found for Spotify ID: {spotify_track_id}")
                 return None

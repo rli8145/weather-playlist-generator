@@ -87,4 +87,4 @@ see ml/results/evaluate_results.txt for other final diagnostics
 
 ## Issues
 
-- As of Nov. 2024, Spotify API does not provide access to audio features. ReccoBeats was thus added for audio features but API response times are often slow and inconsistent. In the future we can experiment with caching song information.
+- As of Nov. 2024, Spotify API does not provide access to audio features. ReccoBeats was thus added for audio features but API experienced high latency. In the future we can experiment with caching song information for faster response times.

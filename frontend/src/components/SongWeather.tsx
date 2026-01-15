@@ -1,10 +1,11 @@
 import { useState } from "react";
 import { motion, AnimatePresence } from "framer-motion";
-import { Search, Music2, Loader2 } from "lucide-react";
+import { Search, Music2, Loader2, AlertCircle } from "lucide-react";
 import { Input } from "@/components/ui/input";
 import { Button } from "@/components/ui/button";
 import { WeatherIcon } from "./weather/WeatherIcon";
 import type { WeatherType } from "./weather/WeatherBackground";
+import { apiService } from "@/services/api-service";
 
 interface SongWeatherProps {
   onWeatherChange: (weather: WeatherType) => void;
@@ -16,63 +17,43 @@ interface SongResult {
   title: string;
   artist: string;
   weather: SongWeatherType;
+  confidence: number;
+  imageUrl?: string;
 }
-
-// Mock song analysis - maps common words to weather moods
-const analyzeSongMood = (query: string): SongWeatherType => {
-  const lowerQuery = query.toLowerCase();
-  
-  // Sunny keywords: happy, upbeat, summer, dance, party, love, joy
-  if (/happy|joy|summer|dance|party|sunshine|bright|love|good|smile|celebrate|fun/.test(lowerQuery)) {
-    return "sunny";
-  }
-  
-  // Rainy keywords: sad, melancholy, tears, cry, goodbye, lost, lonely
-  if (/sad|cry|tears|rain|melancholy|goodbye|lost|lonely|heartbreak|sorry|miss|pain|blue/.test(lowerQuery)) {
-    return "rainy";
-  }
-  
-  // Snowy keywords: calm, peaceful, silent, winter, dream, soft, cold
-  if (/calm|peace|silent|winter|dream|soft|quiet|sleep|gentle|snow|cold|frost|crystal/.test(lowerQuery)) {
-    return "snowy";
-  }
-  
-  // Cloudy keywords: thoughtful, contemplative, grey, neutral
-  if (/think|wonder|grey|gray|cloud|mist|fog|drift|float|ambient/.test(lowerQuery)) {
-    return "cloudy";
-  }
-  
-  // Random assignment based on string hash for other songs
-  const hash = query.split('').reduce((acc, char) => acc + char.charCodeAt(0), 0);
-  const weathers: SongWeatherType[] = ["sunny", "cloudy", "rainy", "snowy"];
-  return weathers[hash % 4];
-};
 
 export const SongWeather = ({ onWeatherChange }: SongWeatherProps) => {
   const [query, setQuery] = useState("");
   const [isSearching, setIsSearching] = useState(false);
   const [result, setResult] = useState<SongResult | null>(null);
+  const [error, setError] = useState<string | null>(null);
 
   const handleSearch = async () => {
     if (!query.trim()) return;
-    
+
     setIsSearching(true);
-    
-    // Simulate API delay
-    await new Promise(resolve => setTimeout(resolve, 1500));
-    
-    const weather = analyzeSongMood(query);
-    const parts = query.split(" - ");
-    
-    const songResult: SongResult = {
-      title: parts[0] || query,
-      artist: parts[1] || "Unknown Artist",
-      weather
-    };
-    
-    setResult(songResult);
-    onWeatherChange(weather);
-    setIsSearching(false);
+    setError(null);
+
+    try {
+      // Call the FastAPI backend
+      const response = await apiService.predictSongWeather(query);
+
+      const songResult: SongResult = {
+        title: response.name,
+        artist: response.artist,
+        weather: response.weather,
+        confidence: response.confidence,
+        imageUrl: response.image_url || undefined,
+      };
+
+      setResult(songResult);
+      onWeatherChange(response.weather);
+    } catch (err) {
+      const errorMessage = err instanceof Error ? err.message : 'Failed to analyze song';
+      setError(errorMessage);
+      console.error('Song search error:', err);
+    } finally {
+      setIsSearching(false);
+    }
   };
 
   const handleKeyDown = (e: React.KeyboardEvent) => {
@@ -161,21 +142,44 @@ export const SongWeather = ({ onWeatherChange }: SongWeatherProps) => {
             className="bg-secondary/30 rounded-xl p-6"
           >
             <div className="flex items-start gap-4">
+              {result.imageUrl && (
+                <img
+                  src={result.imageUrl}
+                  alt={result.title}
+                  className="w-16 h-16 rounded-lg object-cover"
+                />
+              )}
               <WeatherIcon weather={result.weather} size={64} showLabel />
               <div className="flex-1">
                 <h3 className="font-display font-semibold text-lg text-foreground truncate">
                   {result.title}
                 </h3>
                 <p className="text-sm text-muted-foreground mb-2">{result.artist}</p>
-                <p className="text-sm text-foreground/70">
+                <p className="text-sm text-foreground/70 mb-2">
                   {getWeatherDescription(result.weather)}
+                </p>
+                <p className="text-xs text-muted-foreground">
+                  Confidence: {(result.confidence * 100).toFixed(1)}%
                 </p>
               </div>
             </div>
           </motion.div>
         )}
 
-        {!isSearching && !result && (
+        {!isSearching && error && (
+          <motion.div
+            key="error"
+            initial={{ opacity: 0 }}
+            animate={{ opacity: 1 }}
+            exit={{ opacity: 0 }}
+            className="flex items-center gap-3 p-4 bg-destructive/10 border border-destructive/20 rounded-lg"
+          >
+            <AlertCircle className="w-5 h-5 text-destructive flex-shrink-0" />
+            <p className="text-sm text-destructive">{error}</p>
+          </motion.div>
+        )}
+
+        {!isSearching && !result && !error && (
           <motion.div
             key="empty"
             initial={{ opacity: 0 }}

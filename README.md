@@ -88,7 +88,7 @@ Evaluation metrics and diagnostics used in `ml/evaluate.py`:
 ![Confusion matrices](ml/results/confusion_matrices.png)
 see `ml/results/evaluate_results.txt` for other final diagnostics
 
-### Conclusion:
+### Conclusion
 
 We found that `energy`, `valence`, `tempo`, `acousticness`, `loudness`, standardized using `StandardScalar`, were a set of features with consistent, moderately high PFI scores across multiple CV folds and all four models. A structured imbalance was present, with 'energy' (mean 0.224) slightly dominating weaker supporting features such as tempo (mean 0.113). We ultimately achieved **0.758 ± 0.014** weighted F1 with 5-fold stratified cross-validation on our Gradient Boosting production model. 
 

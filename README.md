@@ -77,8 +77,6 @@ python ml/train.py
 python ml/evaluate.py
 ```
 
-We train
-
 Evaluation metrics and diagnostics used in `ml/evaluate.py`:
 
 - Weighted F1 on a simple holdout split was initially used, and we enhanced by using Stratified K-Fold cross-validation with weighted F1

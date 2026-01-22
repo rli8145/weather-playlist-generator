@@ -55,8 +55,8 @@ python 'ml/features->weather.py'
 The user will be prompted for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo (BPM)`, `acousticness [0.0, 1.0]`, and `loudness (dB)` in order, and the predicted weather category is printed.
 
 ## Tech Stack
-- Python - `scikit-learn`, `pandas`, `matplotlib`, `FastAPI` (served via `Uvicorn`)
-- React, Typescript, Tailwind CSS
+- Backend: Python - `scikit-learn`, `pandas`, `matplotlib`, `FastAPI` (served via `Uvicorn`)
+- Frontend: React, Typescript, Tailwind CSS
 
 ## APIs Used
 - Spotify Web API (song lookup)
@@ -65,7 +65,7 @@ The user will be prompted for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo 
 
 ## ML Component
 
-- Data source: `data/track_data.csv`. 
+- Data source: `data/track_data.csv`. We ultmately used 5201 labelled tracks for training/testing, around a third of which were pulled using the Spotify Web API from Spotify-generated and user-made playlists. As no other canonical dataset mapping songs to weather labels exists, and weather labels are **weakly supervised**, we prompted LLMS (ChatGPT and Anthropic) to generate supplemental data based on some explicit heuristics (e.g. melancholic and reflective ambiance -> `rainy`).
 - Features: `energy`, `valence`, `tempo`, `acousticness`, `loudness`. `StandardScalar` was used to standardize each feature.
 - Target label: `weather`: one of `sunny`, `cloudy`, `rainy`, `snowy` 
 - Models in `ml/models.py`, trained using `Pipeline` to avoid data leakage: Naive Bayes, Logistic Regression (baseline), Random Forest, Gradient Boosting (production)
@@ -77,15 +77,24 @@ python ml/train.py
 python ml/evaluate.py
 ```
 
+We train
+
 Evaluation metrics and diagnostics used in `ml/evaluate.py`:
 
-- Weighted F1 on a simple holdout split was initially used, and we improved to Stratified K-Fold cross-validation with weighted F1
+- Weighted F1 on a simple holdout split was initially used, and we enhanced by using Stratified K-Fold cross-validation with weighted F1
 - Permutation feature importance (PFI)
 - Confusion matrices (visualized using matplotlib)
 
 ![Confusion matrices](ml/results/confusion_matrices.png)
 see `ml/results/evaluate_results.txt` for other final diagnostics
 
-## Issues
+### Conclusion:
+
+We found that `energy`, `valence`, `tempo`, `acousticness`, `loudness`, standardized using `StandardScalar`, were a set of features with consistent, moderately high PFI scores across multiple CV folds and all four models. A structured imbalance was present, with 'energy' (mean 0.224) slightly dominating weaker supporting features such as tempo (mean 0.113). 
+
+We ultimately achieved 0.758 ± 0.014 weighted F1 with 5-fold stratified cross-validation on our Gradient Boosting production model. We initially intended the Naive Bayes model to be a deliberately weak baseline, having reasoned that audio features such as 'energy' and 'loudness' are highly correlated and conditionally dependent. However we ended up with a surprisingly high 0.745 CV F1, suggesting that conditioning on the weather label already captured much of the clustering among audio features. In this regime, where features move together and predictive signal was distributed relatively even across features, Naive Bayes can effectively aggregate signals. Nevertheless, expressive models such as Gradient Boosting were nevertheless able to achieve additional gains by modeling nonlinear interactions and residual feature dependencies. For instance, Naive Bayes struggled on differentiating between the similar classes of `snowy` and `rainy`, but Gradient Boosting reduced from 146 to 59 such misclassifications.
+
+## Notes/Possible Improvements
 
 - As of Nov. 2024, Spotify API does not provide access to audio features. ReccoBeats was thus added for audio features but API experienced high latency. In the future we can experiment with caching song information for faster response times.
+- In the future, sentiment/semantic analysis on song lyrics could be used to further our model. For example, our model classifies "Jingle Bell Rock" by Brenda Lee as `sunny`, but the lyrics are definitely more indicative of a `snowy` song. 

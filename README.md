@@ -55,8 +55,25 @@ python 'ml/features->weather.py'
 The user will be prompted for `energy [0.0, 1.0]`, `valence [0.0, 1.0]`, `tempo (BPM)`, `acousticness [0.0, 1.0]`, and `loudness (dB)` in order, and the predicted weather category is printed.
 
 ## Tech Stack
-- Backend: Python - `scikit-learn`, `pandas`, `matplotlib`, `FastAPI` (served via `Uvicorn`)
+- Backend: Python - scikit-learn, pandas, matplotlib, FastAPI (served via Uvicorn)
 - Frontend: React, Typescript, Tailwind CSS
+
+## Project Structure
+
+```text
+.
+├── backend
+│   ├── api
+│   └── app
+├── data
+├── frontend
+│   ├── public
+│   └── src
+├── ml
+│   └── results
+├── README.md
+└── requirements.txt
+```
 
 ## APIs Used
 - Spotify Web API (song lookup)
